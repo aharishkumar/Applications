@@ -45,4 +45,3 @@ Based on the presented architecture above we have implemented following compress
 
 * [LZ4 Compress/Decompress](https://gitenterprise.xilinx.com/heeran/xil_lz4/tree/master/xil_lz4)
 
-
