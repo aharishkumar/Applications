@@ -38,10 +38,14 @@ Diagram above presents overview of LZ kernel architecture for decompression.
 Each decompression engine contains series of modules, which transfer
 data to next module using HLS stream. Similar to LZ compression mm2s(input
 unit) and s2mm(output unit) are connected to decompression engines.
+Each sub-module is designed to process n bytes/clock
+so overall each engine will maintain a constant throughput of n bytes/clock.
+The current design is configured to process 8 bytes/clock.
 
 ## Implemented Algorithms
 
 Based on the presented architecture above we have implemented following compression algorithm.
 
 * [LZ4 Compress/Decompress](https://gitenterprise.xilinx.com/heeran/xil_lz4/tree/master/xil_lz4)
+
 
