@@ -26,7 +26,7 @@ It is possible to extend number of engines to achieve higher throughput.
 | Design | LUT | LUTMEM | REG | BRAM | URAM| DSP | Fmax (MHz) |
 | --------------- | --- | ------ | --- | ---- | --- | -----| -----|
 | Compression     | 81379(7.97%) | 24525(4.25%)|69250(3.25%)|146(7.60%) | 48(5.23%)|1(0.01%)|250|
-| Decompression     | 25036 [ 2.51%] | 4346 [ 0.76%] |23636(1.12%)|18(0.94%)| 4 [ 0.44%]|3(0.04%)|250|
+| Decompression     | 25036(2.51%) | 4346(0.76%) |23636(1.12%)|18(0.94%)| 4(0.44%)|3(0.04%)|250|
 
 
 
