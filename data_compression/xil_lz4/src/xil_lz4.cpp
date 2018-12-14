@@ -359,7 +359,7 @@ uint64_t xil_lz4::decompress_file(std::string & inFile_name,
         uint64_t debytes = decompress(in.data(), out.data(), (input_size - 15), original_size, host_buffer_size);
 
         // Decompression Sequential multiple cus.
-        // uint32_t debytes = decompress_sequential(in.data(), out.data(), (input_size - 15), original_size);
+        //uint32_t debytes = decompress_sequential(in.data(), out.data(), (input_size - 15), original_size);
 
         outFile.write((char *)out.data(), debytes);
         // Close file 
@@ -792,6 +792,9 @@ uint64_t xil_lz4::decompress_sequential(uint8_t *in,
     int total_block_cnt = (original_size - 1) / block_size_in_bytes + 1;
     int block_cntr = 0;
     int done_block_cntr = 0;
+
+    //Assignment to the buffer extensions
+    buffer_extension_assignments(0);
 
     uint32_t no_compress_case=0;
     std::chrono::duration<double, std::nano> kernel_time_ns_1(0);
@@ -1322,6 +1325,9 @@ uint64_t xil_lz4::compress_sequential(uint8_t *in,
 
     uint32_t no_compress_case=0;
    
+    //Assignment to the buffer extensions
+    buffer_extension_assignments(1);
+
     std::chrono::duration<double, std::nano> kernel_time_ns_1(0);
     
     // Keeps track of output buffer index

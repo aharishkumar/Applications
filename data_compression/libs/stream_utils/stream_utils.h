@@ -199,6 +199,7 @@ void stream_downsizer(
         hls::stream<ap_uint<OUT_WIDTH> > &outStream,
         SIZE_DT input_size)
 {
+    if (input_size == 0) return;
     const int c_byte_width = 8;
     const int c_input_word = IN_WIDTH/c_byte_width;
     const int c_out_word   = OUT_WIDTH/c_byte_width;
@@ -238,6 +239,39 @@ void stream_upsizer(
         outStream << outBuffer;
     }
 }
+
+template <class SIZE_DT, int IN_WIDTH, int OUT_WIDTH>
+void stream_upsizer_decompress(
+        hls::stream<ap_uint<IN_WIDTH> >     &inStream,
+        hls::stream<ap_uint<OUT_WIDTH> >    &outStream,
+        SIZE_DT original_size
+        )
+{
+    if (original_size == 0) return;
+
+    //uint32_t read_cntr = 0;
+    uint8_t parallel_byte = IN_WIDTH/8;
+    int pack_size = OUT_WIDTH/IN_WIDTH;
+    ap_uint<OUT_WIDTH> outBuffer;
+    original_size = (original_size - 1)/parallel_byte + 1;
+    for(int i = 0; i < original_size; i += pack_size) {
+        int chunk_size = pack_size;
+        
+        if(i + pack_size > original_size) 
+            chunk_size = original_size - i;
+
+        for(int j = 0; j < chunk_size; j++){
+        #pragma HLS PIPELINE II=1        
+            //read_cntr++;
+            ap_uint<IN_WIDTH> c = inStream.read();
+            outBuffer.range((j+1)*IN_WIDTH - 1, j*IN_WIDTH) = c;
+        }
+
+        outStream << outBuffer;
+    }
+    //printf("Stream_read: %d \n",read_cntr);
+}
+
 template <class SIZE_DT, int IN_WIDTH, int OUT_WIDTH>
 void upsizer_sizestream(
         hls::stream<ap_uint<IN_WIDTH> >     &inStream,

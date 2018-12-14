@@ -42,12 +42,13 @@
 #define BIT 8
 #define READ_STATE 0
 #define MATCH_STATE 1
-#define LOW_OFFSET_STATE 2 
+#define LOW_OFFSET_STATE 4 
 #define LOW_OFFSET 8 // This should be bigger than Pipeline Depth to handle inter dependency false case
 
-typedef ap_uint<BIT> uintV_t;
+typedef ap_uint<PARALLEL_BIT> uintV_t;
 typedef ap_uint<GMEM_DWIDTH> uintMemWidth_t;
 typedef ap_uint<32> compressd_dt;
+typedef ap_uint<16> offset_dt;
 
 #define GET_DIFF_IF_BIG(x,y)   (x>y)?(x-y):0
 
@@ -68,21 +69,30 @@ void lz4_core(
     uint32_t output_size = _output_size;
     uint32_t input_size1  = input_size;
     uint32_t output_size1 = output_size;
-    hls::stream<uintV_t>    instreamV("instreamV"); 
-    hls::stream<compressd_dt> decompressd_stream("decompressd_stream"); 
-    hls::stream<uintV_t>    decompressed_stream("decompressed_stream");
-    #pragma HLS STREAM variable=instreamV               depth=2
-    #pragma HLS STREAM variable=decompressd_stream          depth=2
-    #pragma HLS STREAM variable=decompressed_stream     depth=2
+    hls::stream<uintV_t>        instreamV("instreamV"); 
+    hls::stream<uint32_t>       litlenStream("litlenStream"); 
+    hls::stream<uintV_t>        litStream("litStream"); 
+    hls::stream<offset_dt>      offsetStream("offsetStream"); 
+    hls::stream<uint32_t>       matchlenStream("matchlenStream"); 
+    hls::stream<uintV_t>        decompressed_stream("decompressed_stream");
+    #pragma HLS STREAM variable=instreamV               depth=32
+    #pragma HLS STREAM variable=litlenStream            depth=32
+    #pragma HLS STREAM variable=litStream               depth=32
+    #pragma HLS STREAM variable=offsetStream            depth=32
+    #pragma HLS STREAM variable=matchlenStream          depth=32
+    #pragma HLS STREAM variable=decompressed_stream     depth=32
     #pragma HLS RESOURCE variable=instreamV             core=FIFO_SRL
-    #pragma HLS RESOURCE variable=decompressd_stream        core=FIFO_SRL
+    #pragma HLS RESOURCE variable=litlenStream          core=FIFO_SRL
+    #pragma HLS RESOURCE variable=litStream             core=FIFO_SRL
+    #pragma HLS RESOURCE variable=offsetStream          core=FIFO_SRL
+    #pragma HLS RESOURCE variable=matchlenStream        core=FIFO_SRL
     #pragma HLS RESOURCE variable=decompressed_stream   core=FIFO_SRL
 
     #pragma HLS dataflow 
-    stream_downsizer<uint32_t, GMEM_DWIDTH, 8>(inStreamMemWidth,instreamV,input_size); 
-    lz4_decompressr(instreamV, decompressd_stream, input_size1); 
-    lz_decompress<HISTORY_SIZE,READ_STATE,MATCH_STATE,LOW_OFFSET_STATE,LOW_OFFSET>(decompressd_stream, decompressed_stream, output_size); 
-    stream_upsizer<uint32_t, 8, GMEM_DWIDTH>(decompressed_stream, outStreamMemWidth, output_size1);
+    stream_downsizer<uint32_t, GMEM_DWIDTH, PARALLEL_BIT>(inStreamMemWidth,instreamV,input_size); 
+    lz4_decompressr(instreamV, litlenStream, litStream, offsetStream, matchlenStream, input_size1); 
+    lz_decompress<HISTORY_SIZE,READ_STATE,MATCH_STATE,LOW_OFFSET_STATE,LOW_OFFSET>(litlenStream, litStream, offsetStream, matchlenStream, decompressed_stream, output_size); 
+    stream_upsizer_decompress<uint32_t, PARALLEL_BIT, GMEM_DWIDTH>(decompressed_stream, outStreamMemWidth, output_size1);
 }
 
 void lz4_dec(

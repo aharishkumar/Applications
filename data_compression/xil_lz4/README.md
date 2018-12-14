@@ -18,14 +18,15 @@ For more details refer this [link](https://gitenterprise.xilinx.com/heeran/xil_l
 
 ### Resource Utilization <br />
 
-Table below presents resource utilization of Xilinx LZ4 compress/decompress
-kernels with 8 engines for single compute unit. It is possible to extend number of engines to achieve higher throughput.
+Table below presents resource utilization of Xilinx LZ4 compress
+kernel with 8 engines and decompress kernel with 2 engines for single compute unit. 
+It is possible to extend number of engines to achieve higher throughput.
 
 
 | Design | LUT | LUTMEM | REG | BRAM | URAM| DSP | Fmax (MHz) |
 | --------------- | --- | ------ | --- | ---- | --- | -----| -----|
 | Compression     | 81379(7.97%) | 24525(4.25%)|69250(3.25%)|146(7.60%) | 48(5.23%)|1(0.01%)|250|
-| Decompression     | 35750(3.58%) | 13774(2.40%)|44464(2.11%)|146(7.60%)|0|1(0.01%)|250|
+| Decompression     | 25036 [ 2.51%] | 4346 [ 0.76%] |23636(1.12%)|18(0.94%)| 4 [ 0.44%]|3(0.04%)|250|
 
 
 
@@ -36,8 +37,8 @@ Table below presents the best kernel throughput achieved with single compute uni
 | Topic| Results| 
 |-------|--------|
 |Best Compression Throughput|1.73 GB/s|
-|Best Decompression Throughput| 1.72 GB/s |
-|Average Compression Ratio| 2.15x (Silesia Benchmark)|
+|Best Decompression Throughput| 2.02 GB/s |
+|Average Compression Ratio| 1.95x (Silesia Benchmark)|
 
 Note: Overall throughput can still be increased with multiple compute units.
 
